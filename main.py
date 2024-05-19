@@ -53,6 +53,12 @@ def forward(numfeat):
     mper = 0
     max = Node()
     head = Node()
+    beginningPercent = head.evaluate();
+
+    
+    print(f'Using no features and random evaluation, I get an accuracy of {beginningPercent} \n')
+    print("Beginning Search. \n")
+
     for i in range(numfeat):
         head, fper = head.dosearchfoward(totalpath)
         if(pper > fper):
@@ -74,6 +80,11 @@ def backward(numfeat):
     mper = 0
     max = Node()
     head = Node(totalpath)
+    beginningPercent = head.evaluate();
+
+    print(f'Using no features and random evaluation, I get an accuracy of {beginningPercent} \n')
+    print("Beginning Search. \n")
+
     for i in range(numfeat):
         head, fper = head.dosearchback()
         if(pper > fper):
@@ -88,13 +99,17 @@ def backward(numfeat):
     return 0
     
 def main():
-    numfeat = int(input("Please enter the total number of features: "))
-    selection = input("Which algorithm do you want to run? (Enter 'forward' or 'backward'): ").lower()
+    print("Welcome to Justin's Feature Selection Algorithm. \n")
+    numfeat = int(input("Please enter total number of features: "))
+    print("\n")
+    selection = input("Type the number of the algorithm you want to run. \n Forward Selection \n Backward Selection \n Justin's Special Algorithm \n")
 
-    if selection == 'forward':
+    if selection == '1':
         forward(numfeat)
-    elif selection == 'backward':
+    elif selection == '2':
         backward(numfeat)
+    # elif selection == '3':
+    #     custom?
     else:
         print("Invalid selection. Please choose either 'forward' or 'backward'.")
 
