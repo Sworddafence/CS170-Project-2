@@ -63,7 +63,6 @@ def forward(numfeat):
         head, fper = head.dosearchfoward(totalpath)
         if(pper > fper):
             print(f'(Warning, Accuracy has decreased!)')
-            break
         else:
             max = head
             mper = fper
@@ -89,7 +88,6 @@ def backward(numfeat):
         head, fper = head.dosearchback()
         if(pper > fper):
             print(f'(Warning, Accuracy has decreased!)')
-            break
         else:
             max = head
             mper = fper
