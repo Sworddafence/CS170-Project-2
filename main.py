@@ -88,15 +88,17 @@ def backward(numfeat):
     return 0
     
 def main():
-    # interface
-    #print("Welcome to Justin's Feature Selection Algorithm. ")
-    #numfeat = input("Please enter total number of features: ")
-    #select = input("Type the number of the algorithm you want to run. \nForward Selection \nBackward Elimination \nJustin’s Fun Time sauce Algorithm.     ")
-    #if select == '1':
-    #forward(4)
-    backward(4)
+    numfeat = int(input("Please enter the total number of features: "))
+    selection = input("Which algorithm do you want to run? (Enter 'forward' or 'backward'): ").lower()
 
+    if selection == 'forward':
+        forward(numfeat)
+    elif selection == 'backward':
+        backward(numfeat)
+    else:
+        print("Invalid selection. Please choose either 'forward' or 'backward'.")
 
 if __name__ == "__main__":
     main()
+
 
