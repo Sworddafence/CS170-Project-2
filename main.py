@@ -53,9 +53,9 @@ def forward(numfeat):
     mper = 0
     max = Node()
     head = Node()
-    beginningPercent = head.evaluate();
+    beginningPercent = head.evaluate()
 
-    
+    pper = beginningPercent
     print(f'Using no features and random evaluation, I get an accuracy of {beginningPercent} \n')
     print("Beginning Search. \n")
 
@@ -63,7 +63,8 @@ def forward(numfeat):
         head, fper = head.dosearchfoward(totalpath)
         if(pper > fper):
             print(f'(Warning, Accuracy has decreased!)')
-        else:
+        elif(fper > mper): 
+            print("blahblah")
             max = head
             mper = fper
         pper = fper
@@ -88,7 +89,7 @@ def backward(numfeat):
         head, fper = head.dosearchback()
         if(pper > fper):
             print(f'(Warning, Accuracy has decreased!)')
-        else:
+        elif(fper > mper): 
             max = head
             mper = fper
         pper = fper
