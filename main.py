@@ -64,7 +64,6 @@ def forward(numfeat):
         if(pper > fper):
             print(f'(Warning, Accuracy has decreased!)')
         elif(fper > mper): 
-            print("blahblah")
             max = head
             mper = fper
         pper = fper
