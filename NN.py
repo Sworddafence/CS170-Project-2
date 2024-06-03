@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from pyexpat import features
 from xmlrpc.client import MAXINT
+from collections import Counter
 import time
 import numpy as np
 import math
+import heapq as hq
 
 def euclidean_distance(point1, point2):
     if len(point1) != len(point2):
@@ -17,24 +19,47 @@ class Classifier:
         self.dataset = dataset
         self.features = features
         self.trainingset = []
+        self.k = 0
     
     def train(self, trainingset):
         self.trainingset = trainingset
 
     def testNN(self, id):
         guess = 0
-        mindist = 999999999999.9
+        mindist = float('inf')
         thecords = self.dataset[id]
         realthecords = [thecords[j] for j in self.features]
         for i in self.trainingset:
             cordinates = self.dataset[i]
             realcord = [cordinates[j] for j in self.features]
+            #print(realthecords)
+            #print(realcord)
             truedist = euclidean_distance(realthecords, realcord)
             if truedist < mindist:
                 mindist = truedist
                 guess = self.dataset[i][0]
         return guess
 
+    def testKNN(self, id):        
+        guess = 0
+        distances = []
+
+        thecords = self.dataset[id]
+        realthecords = [thecords[j] for j in self.features]
+        for i in self.trainingset:
+            cordinates = self.dataset[i]
+            realcord = [cordinates[j] for j in self.features]
+            truedist = euclidean_distance(realthecords, realcord)
+            #print(cordinates)
+            hq.heappush(distances, (truedist, cordinates[0]))
+
+        self.k = int(self.k)
+        b = hq.nsmallest(self.k, distances)
+        g = Counter(i[1] for i in b)
+        mos, _ = g.most_common(1)[0]
+        #print(mos)
+        return mos 
+    
     def testNB(self, id):
         guess = 0
         odd1out = self.dataset[id]
@@ -78,12 +103,14 @@ class Classifier:
 
 
 class Validator:
-    def calculate(self, features, dataset, classifier):
+    def calculate(self, features, dataset, classifier, k=None):
         accuracy = [0, 0]
         trainingset = list(range(0, len(dataset)))
         Classi = Classifier(dataset, features)
         n = len(trainingset)
-        
+        if k is not None:
+            Classi.k = k
+
         for i in range(n):
             start_time = time.time()
             tobetest = trainingset.pop(0)
@@ -95,6 +122,8 @@ class Validator:
                 g = Classi.testNN(tobetest)
             elif(classifier == "NB"):
                 g = Classi.testNB(tobetest)
+            elif(classifier == "KNN"):
+                g = Classi.testKNN(tobetest)
             test_end_time = time.time()
             
             #print(f"Training instance {tobetest}: Prediction: {g}, Actual: {dataset[tobetest][0]}, Training time: {train_end_time - train_start_time:.6f}s, Testing time: {test_end_time - test_start_time:.6f}s")
@@ -122,8 +151,9 @@ def main():
     # Use for Large Data Set
     # file_path = '/Users/austinyang/Desktop/CS170-Project-2/large-test-dataset.txt'
     # Use for Small Data Set
-    file_path = '/Users/austinyang/Desktop/CS170-Project-2/small-test-dataset.txt'
-    
+
+    file_path = '/Users/justincrafty/Documents/CS170/CS170-Project-2/small-test-dataset.txt'
+    dataset = np.loadtxt(file_path)
     data = np.loadtxt(file_path)
 
     #Comment this out if you want to use Un-normalized datasetL
@@ -141,7 +171,7 @@ def main():
     # accuracy = validator.calculate([1, 15, 27], "NN", normalized_data)
 
     # Use for Small Data Set Un-normalized dataset
-    accuracy = validator.calculate([3, 5, 7], "NN", data)
+    accuracy = validator.calculate([3, 5, 7], normalized_data, "NN")
     
     # Use for Small Data Set normalized dataset
     # accuracy = validator.calculate([3, 5, 7], "NN", normalized_data)
