@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pyexpat import features
 from xmlrpc.client import MAXINT
 import time
 import numpy as np
@@ -20,7 +21,7 @@ class Classifier:
     def train(self, trainingset):
         self.trainingset = trainingset
 
-    def test(self, id):
+    def testNN(self, id):
         guess = 0
         mindist = 999999999999.9
         thecords = self.dataset[id]
@@ -34,8 +35,50 @@ class Classifier:
                 guess = self.dataset[i][0]
         return guess
 
+    def testNB(self, id):
+        guess = 0
+        odd1out = self.dataset[id]
+        trainingset = self.dataset[self.trainingset]
+        trainingfeatures = trainingset[:, 1:]
+        trainClasses = trainingset[:, 0]
+        classes = np.unique(trainClasses)
+
+
+        numClasses = len(classes)
+        numFeatures = len(trainingset[0])
+        mean = np.zeros((numClasses, numFeatures-1), dtype=np.float64)
+        varience = np.zeros((numClasses, numFeatures-1), dtype=np.float64)
+        priors = np.zeros(numClasses, dtype=np.float64)
+
+        for i, j in enumerate(classes):
+            trainFeatures = trainingfeatures[trainClasses == j]
+            mean[i, :] = trainFeatures.mean(axis=0)
+            varience[i, :] = trainFeatures.var(axis=0)
+            priors[i] = trainFeatures.shape[0] / float(len(trainingset))
+
+        if(self.features == set()):
+            return classes[np.argmax(priors)]
+
+        for x in self.features:
+            probability = []
+            for i, c in enumerate(classes):
+                prior = np.log(priors[i])
+
+                tempnumerator = np.exp(- (odd1out[x] - mean[i]) ** 2 / (2 * varience[i]))
+                tempdenominator = np.sqrt(2 * np.pi * varience[i])
+
+                class_conditional = np.sum(np.log(tempnumerator/tempdenominator))
+                posterior = prior + class_conditional
+                probability.append(posterior)
+                #print(c)
+
+            #print(probability)
+        
+        return classes[np.argmax(probability)]
+
+
 class Validator:
-    def calculate(self, features, classifier, dataset):
+    def calculate(self, features, dataset, classifier):
         accuracy = [0, 0]
         trainingset = list(range(0, len(dataset)))
         Classi = Classifier(dataset, features)
@@ -48,7 +91,10 @@ class Validator:
             Classi.train(trainingset)
             train_end_time = time.time()
             test_start_time = time.time()
-            g = Classi.test(tobetest)
+            if(classifier == "NN"):
+                g = Classi.testNN(tobetest)
+            elif(classifier == "NB"):
+                g = Classi.testNB(tobetest)
             test_end_time = time.time()
             
             #print(f"Training instance {tobetest}: Prediction: {g}, Actual: {dataset[tobetest][0]}, Training time: {train_end_time - train_start_time:.6f}s, Testing time: {test_end_time - test_start_time:.6f}s")
@@ -60,7 +106,7 @@ class Validator:
             trainingset.append(tobetest)
         
         overall_accuracy = accuracy[0] / len(dataset)
-       # print(f"Overall accuracy: {overall_accuracy:.6f}")
+        #print(f"Overall accuracy: {overall_accuracy:.6f}")
         return overall_accuracy
 
 def normalize_dataset(dataset):
@@ -76,16 +122,16 @@ def main():
     # Use for Large Data Set
     # file_path = '/Users/austinyang/Desktop/CS170-Project-2/large-test-dataset.txt'
     # Use for Small Data Set
-    file_path = '/Users/justincrafty/Documents/CS170/CS170-Project-2/small-test-dataset.txt'
+    file_path = '/Users/austinyang/Desktop/CS170-Project-2/small-test-dataset.txt'
     
     data = np.loadtxt(file_path)
 
     #Comment this out if you want to use Un-normalized datasetL
     normalized_data = normalize_dataset(data)
-     
+    
     validator = Validator()
     validation_start_time = time.time()
-    #print(type(data))
+
 
     #Change the parameter for small/large dataset
     # Use for Large Data Set for Un-normalized dataset
