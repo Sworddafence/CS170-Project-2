@@ -51,7 +51,7 @@ class Validator:
             g = Classi.test(tobetest)
             test_end_time = time.time()
             
-            print(f"Training instance {tobetest}: Prediction: {g}, Actual: {dataset[tobetest][0]}, Training time: {train_end_time - train_start_time:.6f}s, Testing time: {test_end_time - test_start_time:.6f}s")
+            #print(f"Training instance {tobetest}: Prediction: {g}, Actual: {dataset[tobetest][0]}, Training time: {train_end_time - train_start_time:.6f}s, Testing time: {test_end_time - test_start_time:.6f}s")
             
             if g == dataset[tobetest][0]:
                 accuracy[0] += 1
@@ -60,7 +60,7 @@ class Validator:
             trainingset.append(tobetest)
         
         overall_accuracy = accuracy[0] / len(dataset)
-        print(f"Overall accuracy: {overall_accuracy:.6f}")
+       # print(f"Overall accuracy: {overall_accuracy:.6f}")
         return overall_accuracy
 
 def normalize_dataset(dataset):
@@ -76,16 +76,16 @@ def main():
     # Use for Large Data Set
     # file_path = '/Users/austinyang/Desktop/CS170-Project-2/large-test-dataset.txt'
     # Use for Small Data Set
-    file_path = '/Users/austinyang/Desktop/CS170-Project-2/small-test-dataset.txt'
+    file_path = '/Users/justincrafty/Documents/CS170/CS170-Project-2/small-test-dataset.txt'
     
     data = np.loadtxt(file_path)
 
     #Comment this out if you want to use Un-normalized datasetL
     normalized_data = normalize_dataset(data)
-    
+     
     validator = Validator()
     validation_start_time = time.time()
-
+    #print(type(data))
 
     #Change the parameter for small/large dataset
     # Use for Large Data Set for Un-normalized dataset

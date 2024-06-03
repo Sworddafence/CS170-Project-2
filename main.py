@@ -1,4 +1,6 @@
 import random
+from NN import Validator
+import numpy as np
 from select import select
 
 
@@ -8,12 +10,27 @@ class Node:
             self.state = []
         else:
             self.state = curr
-    
-    def evaluate(self):
-        r = round(random.uniform(0, 100), 2)
-        return r
+    #def evaluate(self):
+    #    return 1  
+    def randomeval(self, dataset):
+        classes = dataset[:, 0]
+        clasSet = set(classes)
+        classList = list(clasSet)
+        score = 0
+        for i in dataset:
+            random_number = random.choice(classList)
+            if (i[0] == random_number):
+                score = score + 1
+        return (score/len(dataset))
 
-    def dosearchfoward(self, fullset):
+
+
+    def evaluate(self, features, classifer, dataset):
+        validator = Validator()
+        accuracy = validator.calculate(features, classifer, dataset)
+        return accuracy
+
+    def dosearchfoward(self, fullset, dataset):
         maxacc = 0
         toeval =  list(fullset - set(self.state))
         nextstep = Node
@@ -21,7 +38,7 @@ class Node:
             copycurr = self.state.copy()
             copycurr.append(i)
             temp = Node(copycurr)
-            eval = temp.evaluate()
+            eval = temp.evaluate(copycurr, "", dataset)
             if(eval > maxacc):
                 nextstep = temp
                 maxacc = eval
@@ -29,7 +46,7 @@ class Node:
         print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}%\n')
         return nextstep, maxacc
 
-    def dosearchback(self):
+    def dosearchback(self, dataset):
         maxacc = 0
         nextstep = Node
         featremoved = 0
@@ -37,7 +54,7 @@ class Node:
             copycurr = self.state.copy()
             copycurr.remove(i)
             temp = Node(copycurr)
-            eval = temp.evaluate()
+            eval = temp.evaluate(copycurr, "", dataset)
             if(eval > maxacc):
                 nextstep = temp
                 maxacc = eval
@@ -49,18 +66,22 @@ def forward(numfeat):
     totalpath = set()
     for i in range(1, numfeat + 1):
         totalpath.add(i)
+
+    file_path = '/Users/justincrafty/Documents/CS170/CS170-Project-2/small-test-dataset.txt'
+    dataset = np.loadtxt(file_path)
+    #print(type(dataset))
     pper = 0
     mper = 0
     max = Node()
     head = Node()
-    beginningPercent = head.evaluate()
+    beginningPercent = head.randomeval(dataset)
 
     pper = beginningPercent
     print(f'Using no features and random evaluation, I get an accuracy of {beginningPercent} \n')
     print("Beginning Search. \n")
 
     for i in range(numfeat):
-        head, fper = head.dosearchfoward(totalpath)
+        head, fper = head.dosearchfoward(totalpath, dataset)
         if(pper > fper):
             print(f'(Warning, Accuracy has decreased!)')
         elif(fper > mper): 
@@ -72,6 +93,8 @@ def forward(numfeat):
     return 0
 
 def backward(numfeat):
+    file_path = '/Users/justincrafty/Documents/CS170/CS170-Project-2/small-test-dataset.txt'
+    dataset = np.loadtxt(file_path)
     totalpath = set()
     for i in range(1, numfeat + 1):
         totalpath.add(i)
@@ -79,13 +102,13 @@ def backward(numfeat):
     mper = 0
     max = Node()
     head = Node(totalpath)
-    beginningPercent = head.evaluate();
+    beginningPercent = head.evaluate(list(totalpath), "", dataset)
 
-    print(f'Using no features and random evaluation, I get an accuracy of {beginningPercent} \n')
+    print(f'Using all features, I get an accuracy of {beginningPercent} \n')
     print("Beginning Search. \n")
 
     for i in range(numfeat):
-        head, fper = head.dosearchback()
+        head, fper = head.dosearchback(dataset)
         if(pper > fper):
             print(f'(Warning, Accuracy has decreased!)')
         elif(fper > mper): 
