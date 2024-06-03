@@ -118,6 +118,7 @@ class Validator:
             Classi.train(trainingset)
             train_end_time = time.time()
             test_start_time = time.time()
+            
             if(classifier == "NN"):
                 g = Classi.testNN(tobetest)
             elif(classifier == "NB"):
@@ -147,39 +148,60 @@ def normalize_dataset(dataset):
     return normalized_dataset
 
 def main():
-    #Choosing dataset: Change filepath so it works for your computer
-    # Use for Large Data Set
-    # file_path = '/Users/austinyang/Desktop/CS170-Project-2/large-test-dataset.txt'
-    # Use for Small Data Set
-
-    file_path = '/Users/justincrafty/Documents/CS170/CS170-Project-2/small-test-dataset.txt'
-    dataset = np.loadtxt(file_path)
-    data = np.loadtxt(file_path)
-
-    #Comment this out if you want to use Un-normalized datasetL
-    normalized_data = normalize_dataset(data)
     
+    #Choosing dataset: Change filepath so it works for your computer
+    print("Select which dataset to use: ")
+    data_num = int(input("Type '1' for small dataset. Type '2' for large dataset: "))
+
+    if data_num == 1:
+        file_path = 'CS170_Spring_2024_Small_data__69.txt'
+        data = np.loadtxt(file_path)
+
+    elif data_num == 2:
+        file_path = 'CS170_Spring_2024_Large_data__69.txt'
+        data = np.loadtxt(file_path)
+    else:
+        print("Wrong input")
+
+    print("Do you want to use Un-normalized dataset or Normalized dataset")
+    normalize_num  = int(input("Type '1' for Un-normalized dataset or Type '2' for Normalized dataset: "))
+
+    #Comment this out if you want to use Un-normalized dataset
+    if normalize_num == 2:
+        normalized_data = normalize_dataset(data)
+    
+
     validator = Validator()
     validation_start_time = time.time()
 
-
     #Change the parameter for small/large dataset
     # Use for Large Data Set for Un-normalized dataset
-    # accuracy = validator.calculate([1, 15, 27], "NN", data)
+    if data_num == 2 and normalize_num == 1:
+        accuracy = validator.calculate([1, 15, 27], data, "NN")
+        validation_end_time = time.time()
+        print(f"Validation completed in {validation_end_time - validation_start_time:.6f}s")
+        print(f"Accuracy: {accuracy:.6f}")
 
     # Use for Large Data Set for normalized dataset
-    # accuracy = validator.calculate([1, 15, 27], "NN", normalized_data)
+    elif data_num == 2 and normalize_num == 2:
+        accuracy = validator.calculate([1, 15, 27], normalized_data, "NN")
+        validation_end_time = time.time()
+        print(f"Validation completed in {validation_end_time - validation_start_time:.6f}s")
+        print(f"Accuracy: {accuracy:.6f}")
 
     # Use for Small Data Set Un-normalized dataset
-    accuracy = validator.calculate([3, 5, 7], normalized_data, "NN")
+    elif data_num == 1 and normalize_num == 1:
+        accuracy = validator.calculate([3, 5, 7], data, "NN")
+        validation_end_time = time.time()
+        print(f"Validation completed in {validation_end_time - validation_start_time:.6f}s")
+        print(f"Accuracy: {accuracy:.6f}")
     
     # Use for Small Data Set normalized dataset
-    # accuracy = validator.calculate([3, 5, 7], "NN", normalized_data)
-    
-
-    validation_end_time = time.time()
-    print(f"Validation completed in {validation_end_time - validation_start_time:.6f}s")
-    print(f"Accuracy: {accuracy:.6f}")
+    elif data_num == 1 and normalize_num == 2:
+        accuracy = validator.calculate([3, 5, 7], normalized_data, "NN")
+        validation_end_time = time.time()
+        print(f"Validation completed in {validation_end_time - validation_start_time:.6f}s")
+        print(f"Accuracy: {accuracy:.6f}")
 
 if __name__ == "__main__":
     main()
