@@ -58,22 +58,22 @@ class Classifier:
 
         if(self.features == set()):
             return classes[np.argmax(priors)]
-
+        probability = [0,0]
         for x in self.features:
-            probability = []
             for i, c in enumerate(classes):
-                prior = np.log(priors[i])
+                
 
                 tempnumerator = np.exp(- (odd1out[x] - mean[i]) ** 2 / (2 * varience[i]))
                 tempdenominator = np.sqrt(2 * np.pi * varience[i])
 
                 class_conditional = np.sum(np.log(tempnumerator/tempdenominator))
-                posterior = prior + class_conditional
-                probability.append(posterior)
+                
+                probability[int(i)] = probability[int(i)] + class_conditional
                 #print(c)
-
+            
             #print(probability)
-        
+        for i in range(len(classes)):
+            probability[i] = probability[i] + priors[i]
         return classes[np.argmax(probability)]
 
 
