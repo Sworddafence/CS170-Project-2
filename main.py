@@ -19,7 +19,7 @@ class Node:
         classList = list(clasSet)
         score = 0
         for i in dataset:
-            random_number = random.choice(classList)
+            random_number = random.choice(classes)
             if (i[0] == random_number):
                 score = score + 1
         return (score/len(dataset))
@@ -167,8 +167,6 @@ def backward(numfeat, classifer):
         k = input("What K value do you want:")
         head.k = k
 
-    
-
     beginningPercent = head.evaluate(list(totalpath), dataset, classifer)
 
     print(f'Using all features, I get an accuracy of {beginningPercent} \n')
@@ -233,7 +231,7 @@ def mostsignificant(numfeat, classifer):
     if classifer == 'KNN':
         head.k = k
     accuracys = head.dosearchsignifcant(totalpath, dataset, classifer)
-    filtered_list = [x for x in accuracys if x[0] >= 0.70]
+    filtered_list = [x for x in accuracys if x[0] >= beginningPercent]
 
     first_values = [pair[1] for pair in filtered_list]
 
