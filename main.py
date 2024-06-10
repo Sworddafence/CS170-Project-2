@@ -101,7 +101,9 @@ class Node:
         maxacc = 0
         toeval =  list(fullset - set(self.state))
         nextstep = Node
-        print(toeval)
+
+        paired_val = []
+
         for i in toeval:
             copycurr = self.state.copy()
             copycurr.append(i)
@@ -109,12 +111,13 @@ class Node:
             if(self.k):
                 temp.k = self.k
             eval = temp.evaluate(copycurr, dataset, classifer)
-            if(eval > maxacc):
-                nextstep = temp
-                maxacc = eval
+            pair = (eval, i)
+            paired_val.append(pair)
             print(f'Using feature(s) {copycurr} accuracy is {eval}')
-        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}\n')
-        return nextstep, maxacc
+    
+
+        paired_val.sort(reverse=True)
+        return paired_val
 
 
 def forward(numfeat, classifer):
@@ -229,15 +232,13 @@ def mostsignificant(numfeat, classifer):
 
     if classifer == 'KNN':
         head.k = k
-    head, fper = head.dosearchsignifcant(totalpath, dataset, classifer)
-    if(pper > fper):
-        print(f'(Warning, Accuracy has decreased!)')
-    elif(fper > mper): 
-        max = head
-        mper = fper
-    pper = fper
+    accuracys = head.dosearchsignifcant(totalpath, dataset, classifer)
+    filtered_list = [x for x in accuracys if x[0] >= 0.70]
 
-    print(f'Finished search!! The best feature subset is {max.state} , which has an accuracy of {mper}')
+    first_values = [pair[1] for pair in filtered_list]
+
+    print(f'Finished search!! The best feature subset is {first_values}')
+
     return 0
 
 
@@ -245,15 +246,17 @@ def main():
     print("Welcome to Justin's Feature Selection Algorithm. \n")
     numfeat = int(input("Please enter total number of features: "))
     print("\n")
-    selection = input("Type the number of the algorithm you want to run. \n Forward Selection \n Backward Selection \n Justin's Special Algorithm \n")
+    selection = input("Type the number of the algorithm you want to run. \n Forward Selection \n Backward Selection \n Justin's Special Algorithm \n Most signifcant features\n")
     classifierr = input("Type the classifer of the algorithm you want to run.")
 
     if selection == '1':
-        mostsignificant(numfeat, classifierr)
+        forward(numfeat, classifierr)
     elif selection == '2':
         backward(numfeat, classifierr)
     elif selection == '3':
         everything(numfeat, classifierr)
+    elif selection == '4':
+        mostsignificant(numfeat, classifierr)
     else:
         print("Invalid selection. Please choose either 'forward' or 'backward'.")
 
