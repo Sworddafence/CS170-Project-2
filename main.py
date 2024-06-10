@@ -49,8 +49,8 @@ class Node:
             if(eval > maxacc):
                 nextstep = temp
                 maxacc = eval
-            print(f'Using feature(s) {copycurr} accuracy is {eval}%')
-        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}%\n')
+            print(f'Using feature(s) {copycurr} accuracy is {eval}')
+        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}\n')
         return nextstep, maxacc
 
     def dosearchback(self, dataset, classifer):
@@ -67,8 +67,8 @@ class Node:
             if(eval > maxacc):
                 nextstep = temp
                 maxacc = eval
-            print(f'Using feature(s) {copycurr} accuracy is {eval}%')
-        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}%\n')
+            print(f'Using feature(s) {copycurr} accuracy is {eval}')
+        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}\n')
         return nextstep, maxacc
 
     def dosearcheverything(self, fullset, dataset, classifer):
@@ -93,9 +93,29 @@ class Node:
             if(eval > maxacc):
                 nextstep = temp
                 maxacc = eval
-            print(f'Using feature(s) {copycurr} accuracy is {eval}%')
-        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}%\n')
+            print(f'Using feature(s) {copycurr} accuracy is {eval}')
+        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}\n')
         return nextstep, maxacc
+
+    def dosearchsignifcant(self, fullset, dataset, classifer):
+        maxacc = 0
+        toeval =  list(fullset - set(self.state))
+        nextstep = Node
+        print(toeval)
+        for i in toeval:
+            copycurr = self.state.copy()
+            copycurr.append(i)
+            temp = Node(copycurr)
+            if(self.k):
+                temp.k = self.k
+            eval = temp.evaluate(copycurr, dataset, classifer)
+            if(eval > maxacc):
+                nextstep = temp
+                maxacc = eval
+            print(f'Using feature(s) {copycurr} accuracy is {eval}')
+        print(f'\nFeature set {nextstep.state} was best, accuracy is {maxacc}\n')
+        return nextstep, maxacc
+
 
 def forward(numfeat, classifer):
     totalpath = set()
@@ -138,11 +158,14 @@ def backward(numfeat, classifer):
         totalpath.add(i)
     pper = 0
     mper = 0
-    if classifer == 'KNN':
-        k = input("What K value do you want:")
     max = Node()
     head = Node(totalpath)
-    head.k = k
+    if classifer == 'KNN':
+        k = input("What K value do you want:")
+        head.k = k
+
+    
+
     beginningPercent = head.evaluate(list(totalpath), dataset, classifer)
 
     print(f'Using all features, I get an accuracy of {beginningPercent} \n')
@@ -185,6 +208,38 @@ def everything(numfeat, classifer):
     print(f'Finished search!! The best feature subset is {head.state} , which has an accuracy of {fper}')
     return 0
 
+def mostsignificant(numfeat, classifer):
+    totalpath = set()
+    for i in range(1, numfeat + 1):
+        totalpath.add(i)
+    if classifer == 'KNN':
+        k = input("What K value do you want:")
+    file_path = '/Users/justincrafty/Documents/CS170/CS170-Project-2/CS170_Spring_2024_Small_data__69.txt'
+    dataset = np.loadtxt(file_path)
+    #print(type(dataset))
+    pper = 0
+    mper = 0
+    max = Node()
+    head = Node()
+    beginningPercent = head.randomeval(dataset)
+
+    pper = beginningPercent
+    print(f'Using no features and random evaluation, I get an accuracy of {beginningPercent} \n')
+    print("Beginning Search. \n")
+
+    if classifer == 'KNN':
+        head.k = k
+    head, fper = head.dosearchsignifcant(totalpath, dataset, classifer)
+    if(pper > fper):
+        print(f'(Warning, Accuracy has decreased!)')
+    elif(fper > mper): 
+        max = head
+        mper = fper
+    pper = fper
+
+    print(f'Finished search!! The best feature subset is {max.state} , which has an accuracy of {mper}')
+    return 0
+
 
 def main():
     print("Welcome to Justin's Feature Selection Algorithm. \n")
@@ -194,7 +249,7 @@ def main():
     classifierr = input("Type the classifer of the algorithm you want to run.")
 
     if selection == '1':
-        forward(numfeat, classifierr)
+        mostsignificant(numfeat, classifierr)
     elif selection == '2':
         backward(numfeat, classifierr)
     elif selection == '3':
