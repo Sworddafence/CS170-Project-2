@@ -304,7 +304,7 @@ def main():
     numfeat = int(input("Please enter total number of features: "))
     print("\n")
     print("'1' for Forward Selection, '2' for Backward Selection, '3' for Justin's Special Algorithm, '4' for Most Significant Features Algorithm")
-    selection = input("Type the number of the algorithm you want to run. \n Forward Selection \n Backward Selection \n Justin's Special Algorithm \n Most signifcant features\n")
+    selection = input("Type the number of the algorithm you want to run. \n Forward Selection \n Backward Selection \n Everything Algorithm \n Most signifcant features\n")
     select = int(input("Select small/large dataset. '1' for small. '2' for large: "))
     choice = int(input("Enter your choice. '1' for non-normalize. '2' for normalize: "))
     choice2 = input("Type the classifer of the algorithm you want to run. Type '1' for KNN, '2' for NN, '3' for NB: ")
