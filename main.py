@@ -20,7 +20,7 @@ class Node:
         classList = list(clasSet)
         score = 0
         for i in dataset:
-            random_number = random.choice(classList)
+            random_number = random.choice(classes)
             if (i[0] == random_number):
                 score = score + 1
         return (score/len(dataset))
