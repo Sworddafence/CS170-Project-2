@@ -290,7 +290,7 @@ def mostsignificant(numfeat, classifer, choice, select):
         accuracys = head.dosearchsignifcant(totalpath, dataset, classifer)
     if choice == 2:
         accuracys = head.dosearchsignifcant(totalpath, normalized_data, classifer)
-    filtered_list = [x for x in accuracys if x[0] >= 0.70]
+    filtered_list = [x for x in accuracys if x[0] >= beginningPercent]
 
     first_values = [pair[1] for pair in filtered_list]
 
